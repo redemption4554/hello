@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Pour Clémence</title>
+    <title>Clémence - Éternité</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;400;900&display=swap');
 
@@ -15,8 +15,22 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background: #000; height: 100vh; height: -webkit-fill-available; overflow: hidden; 
-            font-family: 'Montserrat', sans-serif; position: fixed; width: 100%;
+            background: #000; 
+            height: 100vh; 
+            width: 100vw;
+            overflow: hidden; 
+            font-family: 'Montserrat', sans-serif; 
+            position: fixed;
+        }
+
+        /* Canvas - Forçage du centrage */
+        #world {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 1;
         }
 
         #gate {
@@ -29,9 +43,7 @@
             text-transform: uppercase; cursor: pointer; font-size: 0.8rem;
         }
 
-        canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-
-        /* Titre du haut - Ajusté pour iPhone */
+        /* Message du haut */
         #ui-top {
             position: absolute; top: 12%; left: 0; width: 100%;
             text-align: center; z-index: 5; pointer-events: none;
@@ -40,32 +52,33 @@
         .message-box {
             font-family: 'Cinzel', serif; color: var(--gold);
             font-size: 0.7rem; letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
 
-        /* TEXTE CENTRAL - Remonté à 42% pour le centre visuel Safari */
-        .interaction-zone {
-            position: absolute; 
-            top: 42%; left: 50%; 
+        /* TEXTE CENTRAL - Centrage Absolu CSS */
+        .center-ui {
+            position: absolute;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            width: 100%; height: 30%;
-            display: flex; justify-content: center; align-items: center;
             z-index: 100;
-            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            pointer-events: all;
+            opacity: 0;
         }
         
         .main-heart-btn {
             font-family: 'Cinzel', serif; color: #fff; font-size: 1.8rem;
             letter-spacing: 5px; text-shadow: 0 0 25px var(--red);
-            pointer-events: none;
+            cursor: pointer;
         }
 
-        /* CADENAS - Positionné pour éviter la barre de lien */
+        /* CADENAS - Remonté pour Safari */
         #secret-btn {
             position: absolute; 
-            bottom: 22%; /* Remonté pour être bien au-dessus des contrôles Safari */
+            bottom: 140px; 
             left: 50%; transform: translateX(-50%);
-            width: 55px; height: 55px; border-radius: 50%;
+            width: 60px; height: 60px; border-radius: 50%;
             border: 1px solid var(--gold);
             background: rgba(0,0,0,0.8); z-index: 150;
             display: flex; justify-content: center; align-items: center;
@@ -84,33 +97,26 @@
         }
         .letter-content {
             border: 1px solid var(--gold); padding: 30px; text-align: center;
-            color: #fff; font-family: 'Cinzel', serif; line-height: 1.8;
-            background: #050505;
+            color: #fff; font-family: 'Cinzel', serif; line-height: 1.8; background: #000;
         }
 
         #transition-msg {
-            position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; text-align: center; z-index: 200; color: white;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 85%; text-align: center; z-index: 201; color: white;
             font-family: 'Cinzel', serif; font-size: 1rem; opacity: 0; transition: 1s;
-        }
-
-        #flash {
-            position: fixed; inset: 0; background: white; z-index: 1500;
-            opacity: 0; pointer-events: none;
+            pointer-events: none;
         }
     </style>
 </head>
-<body>
+<body ontouchstart="">
 
     <audio id="music" loop>
         <source src="https://www.chosic.com/wp-content/uploads/2021/07/Rainy-Day-Implicit.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="flash"></div>
-
     <div id="gate">
-        <h2 style="color:var(--gold); font-family:'Cinzel'; margin-bottom:20px; letter-spacing:5px; font-size:0.8rem;">CLÉMENCE</h2>
-        <button class="btn-luxe" onclick="reveal()">Ouvrir mon cœur</button>
+        <h2 style="color:var(--gold); font-family:'Cinzel'; margin-bottom:20px; letter-spacing:5px;">CLÉMENCE</h2>
+        <button class="btn-luxe" onclick="reveal()">Entrer dans mon cœur</button>
     </div>
 
     <div id="ui-top">
@@ -126,7 +132,7 @@
         </div>
     </div>
 
-    <div class="interaction-zone" ontouchstart="triggerAction()" onclick="triggerAction()">
+    <div class="center-ui" id="main-ui" onclick="triggerAction()">
         <h2 class="main-heart-btn" id="btn-label">JE T'AIME</h2>
     </div>
 
@@ -150,21 +156,24 @@
         let clickCount = 0;
         let state = "NORMAL";
 
-        const SOUVENIRS = ["TON SOURIRE...", "NOS NUITS...", "TON REGARD...", "CETTE MAGIE...", "NOTRE AMOUR...", "MON ÉTERNITÉ..."];
+        const SOUVENIRS = ["TON SOURIRE...", "NOS NUITS...", "TON REGARD...", "NOTRE AMOUR...", "MON ÉTERNITÉ..."];
 
         function init() {
-            dpr = Math.min(window.devicePixelRatio || 1, 2);
-            width = window.innerWidth; 
+            dpr = window.devicePixelRatio || 1;
+            width = window.innerWidth;
             height = window.innerHeight;
-            canvas.width = width * dpr; 
+            
+            // Correction Safari Retina
+            canvas.width = width * dpr;
             canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            
             ctx.scale(dpr, dpr);
 
-            // Taille du cœur calibrée pour iPhone portrait
-            const heartScale = Math.min(width, height) * 0.028; 
-            
+            const heartScale = Math.min(width, height) * 0.035; 
             particles = [];
-            for(let i=0; i<3000; i++) {
+            for(let i=0; i<3500; i++) {
                 let t = Math.random() * Math.PI * 2;
                 let r = Math.sqrt(Math.random()) * heartScale;
                 particles.push({
@@ -172,7 +181,7 @@
                     baseY: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * r,
                     baseZ: (Math.random()-0.5) * 150,
                     x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0,
-                    size: Math.random() * 1.2 + 0.3,
+                    size: Math.random() * 1.5 + 0.5,
                     color: Math.random() > 0.15 ? "#ff0033" : "#d4af37"
                 });
             }
@@ -185,6 +194,7 @@
             setTimeout(() => {
                 document.getElementById('gate').style.display = 'none';
                 document.getElementById('ui-top').style.opacity = '1';
+                document.getElementById('main-ui').style.opacity = '1';
                 isRevealed = true;
             }, 800);
         }
@@ -197,45 +207,42 @@
                 txt.innerText = SOUVENIRS[clickCount % SOUVENIRS.length];
                 txt.style.opacity = 1;
                 clickCount++;
-                if(clickCount === 7) startSupernova();
+                if(clickCount === 6) startSupernova();
             }, 250);
         }
 
         function startSupernova() {
             state = "EXPLODING";
-            document.getElementById('btn-label').style.opacity = '0';
+            document.getElementById('main-ui').style.opacity = '0';
             document.getElementById('ui-top').style.opacity = '0';
             
             setTimeout(() => {
-                document.getElementById('flash').style.opacity = '1';
+                particles.forEach(p => {
+                    let f = Math.random() * 50 + 20;
+                    p.vx = (Math.random() - 0.5) * f;
+                    p.vy = (Math.random() - 0.5) * f;
+                    p.vz = (Math.random() - 0.5) * f;
+                });
                 setTimeout(() => {
-                    document.getElementById('flash').style.opacity = '0';
-                    particles.forEach(p => {
-                        let f = Math.random() * 50 + 20;
-                        p.vx = (Math.random() - 0.5) * f; p.vy = (Math.random() - 0.5) * f; p.vz = (Math.random() - 0.5) * f;
-                    });
+                    state = "MESSAGE";
+                    document.getElementById('transition-msg').style.opacity = '1';
                     setTimeout(() => {
-                        state = "MESSAGE";
-                        document.getElementById('transition-msg').style.opacity = '1';
+                        document.getElementById('transition-msg').style.opacity = '0';
+                        state = "REFORMING";
                         setTimeout(() => {
-                            document.getElementById('transition-msg').style.opacity = '0';
-                            state = "REFORMING";
-                            setTimeout(() => {
-                                state = "NORMAL"; clickCount = 0;
-                                document.getElementById('btn-label').style.opacity = '1';
-                                document.getElementById('ui-top').style.opacity = '1';
-                                document.getElementById('m-text').innerText = "CLÉMENCE, JE T'AIME...";
-                            }, 3000);
-                        }, 4000);
-                    }, 2000);
-                }, 100);
-            }, 800);
+                            state = "NORMAL"; clickCount = 0;
+                            document.getElementById('main-ui').style.opacity = '1';
+                            document.getElementById('ui-top').style.opacity = '1';
+                        }, 3000);
+                    }, 4000);
+                }, 2000);
+            }, 500);
         }
 
         function startHold(e) {
             const fill = document.getElementById('hold-fill');
             fill.style.opacity = "1";
-            fill.animate([{transform: 'rotate(0deg)'}, {transform: 'rotate(360deg)'}], {duration: 1000, iterations: Infinity});
+            fill.animate([{transform: 'rotate(0)'}, {transform: 'rotate(360deg)'}], {duration: 1000, iterations: Infinity});
             holdTimer = setTimeout(() => {
                 document.getElementById('hiddenLetter').style.display = 'flex';
                 endHold();
@@ -248,32 +255,36 @@
             ctx.fillRect(0,0,width,height);
 
             if(isRevealed) {
-                rotation += 0.013;
+                rotation += 0.015;
                 let pulse = 1 + Math.sin(Date.now() * 0.003) * 0.1;
+
+                ctx.save();
+                // LE SECRET EST ICI : ON DÉPLACE TOUT LE CANVAS AU CENTRE
+                ctx.translate(width / 2, height / 2);
 
                 particles.forEach((p) => {
                     if(state === "EXPLODING") {
                         p.x += p.vx; p.y += p.vy; p.z += p.vz;
                         p.vx *= 0.96; p.vy *= 0.96; p.vz *= 0.96;
                     } else if(state === "REFORMING") {
-                        p.x += (p.baseX - p.x) * 0.08;
-                        p.y += (p.baseY - p.y) * 0.08;
-                        p.z += (p.baseZ - p.z) * 0.08;
+                        p.x += (p.baseX - p.x) * 0.1;
+                        p.y += (p.baseY - p.y) * 0.1;
+                        p.z += (p.baseZ - p.z) * 0.1;
                     }
 
                     let cosR = Math.cos(rotation), sinR = Math.sin(rotation);
                     let rx = p.x * cosR - p.z * sinR;
                     let rz = p.x * sinR + p.z * cosR;
-                    let s = 450 / (450 + rz + 180);
+                    let s = 400 / (400 + rz + 150);
                     
-                    // ON DESSINE LE COEUR À 42% DE LA HAUTEUR (IDENTIQUE AU TEXTE)
-                    let px = rx * s * (state === "NORMAL" ? pulse : 1) + width / 2;
-                    let py = p.y * s * (state === "NORMAL" ? pulse : 1) + height * 0.42;
+                    let px = rx * s * (state === "NORMAL" ? pulse : 1);
+                    let py = p.y * s * (state === "NORMAL" ? pulse : 1);
 
-                    ctx.globalAlpha = s;
+                    ctx.globalAlpha = Math.min(1, s);
                     ctx.fillStyle = p.color;
                     ctx.fillRect(px, py, p.size * s, p.size * s);
                 });
+                ctx.restore();
             }
             requestAnimationFrame(animate);
         }
