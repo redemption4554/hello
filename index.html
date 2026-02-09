@@ -3,36 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pour Clémence - Horizon</title>
+    <title>Clémence - Éternité</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;400;900&display=swap');
 
         :root {
             --gold: #d4af37;
             --red: #ff0033;
-            --bg: #030303;
         }
 
+        /* Empêche les rebonds et le scroll sur mobile */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             background: #000; height: 100vh; overflow: hidden; 
             font-family: 'Montserrat', sans-serif; position: fixed; width: 100%;
         }
 
-        /* Gate */
+        /* Écran de démarrage */
         #gate {
             position: fixed; inset: 0; background: #000; z-index: 2000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         .btn-luxe {
             background: none; border: 1px solid var(--gold); color: var(--gold);
-            padding: 18px 35px; font-family: 'Cinzel', serif; letter-spacing: 5px;
-            text-transform: uppercase; cursor: pointer;
+            padding: 15px 30px; font-family: 'Cinzel', serif; letter-spacing: 4px;
+            text-transform: uppercase; cursor: pointer; font-size: 0.8rem;
         }
 
         canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 
-        /* Souvenirs & Messages */
+        /* Textes du haut (Souvenirs) */
         #ui-top {
             position: absolute; top: 12%; left: 0; width: 100%;
             text-align: center; z-index: 5; pointer-events: none;
@@ -40,41 +40,41 @@
         }
         .message-box {
             font-family: 'Cinzel', serif; color: var(--gold);
-            font-size: 0.9rem; letter-spacing: 3px;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            font-size: 0.75rem; letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
             padding: 0 30px;
         }
 
+        /* Message d'explosion */
         #transition-msg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%);
             width: 85%; text-align: center; z-index: 20; color: white;
-            font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 2px;
-            opacity: 0; transition: 2s; line-height: 1.8;
-            text-shadow: 0 0 20px var(--gold);
+            font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 2px;
+            opacity: 0; transition: 1.5s; line-height: 1.6;
+            text-shadow: 0 0 15px var(--gold);
         }
 
-        /* Interaction Centrale */
+        /* Zone de clic centrale */
         .interaction-zone {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 250px; height: 250px; border-radius: 50%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 10; cursor: pointer;
+            position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%);
+            width: 250px; height: 250px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10;
         }
         .main-heart-btn {
-            font-family: 'Cinzel', serif; color: #fff; font-size: 1.8rem;
-            letter-spacing: 6px; text-shadow: 0 0 30px var(--red);
-            transition: 0.3s; pointer-events: none;
+            font-family: 'Cinzel', serif; color: #fff; font-size: 1.6rem;
+            letter-spacing: 4px; text-shadow: 0 0 20px var(--red);
+            transition: 0.2s; pointer-events: none;
         }
-        .interaction-zone:active .main-heart-btn { transform: scale(0.85); opacity: 0.6; }
 
-        /* Cadenas */
+        /* Cadenas (Secret) - Ajusté pour le pouce en bas */
         #secret-btn {
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            width: 50px; height: 50px; border-radius: 50%;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(0,0,0,0.5); z-index: 100;
+            position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
+            width: 55px; height: 55px; border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            background: rgba(0,0,0,0.6); z-index: 100;
             display: flex; justify-content: center; align-items: center;
-            color: var(--gold); font-size: 1.2rem;
+            color: var(--gold); font-size: 1.3rem;
         }
         #hold-fill {
             position: absolute; inset: -2px; border-radius: 50%;
@@ -82,18 +82,19 @@
             opacity: 0;
         }
 
-        /* Lettre */
+        /* Fenêtre de la Lettre */
         #hiddenLetter {
             position: fixed; inset: 0; background: rgba(0,0,0,0.98);
             z-index: 3000; display: none; justify-content: center; align-items: center;
             padding: 30px;
         }
         .letter-content {
-            border: 1px solid var(--gold); padding: 35px; text-align: center;
-            color: #fff; font-family: 'Cinzel', serif; line-height: 2;
-            background: #050505; max-width: 400px;
+            border: 1px solid var(--gold); padding: 35px 25px; text-align: center;
+            color: #fff; font-family: 'Cinzel', serif; line-height: 1.8;
+            background: #050505; font-size: 0.9rem; max-width: 400px;
         }
 
+        /* Flash explosion */
         #flash {
             position: fixed; inset: 0; background: white; z-index: 1500;
             opacity: 0; pointer-events: none;
@@ -109,8 +110,8 @@
     <div id="flash"></div>
 
     <div id="gate">
-        <h1 style="color:var(--gold); font-family:'Cinzel'; margin-bottom:30px; letter-spacing:8px;">CLÉMENCE</h1>
-        <button class="btn-luxe" onclick="reveal()">Ouvrir mon cœur</button>
+        <h2 style="color:var(--gold); font-family:'Cinzel'; margin-bottom:20px; letter-spacing:5px; font-size:0.9rem;">CLÉMENCE</h2>
+        <button class="btn-luxe" onclick="reveal()">Entrer dans mon cœur</button>
     </div>
 
     <div id="ui-top">
@@ -121,19 +122,19 @@
 
     <div id="hiddenLetter" onclick="this.style.display='none'">
         <div class="letter-content">
-            <h3 style="color:var(--gold); margin-bottom:20px;">À MA Princesse</h3>
-            <p>Tu es la fille avec qui je veux passer mes jours et mes nuits, partager mes rêves et mes peurs, et construire une vie pleine d'amour et de bonheur.</p>
-            <p style="margin-top:20px; font-size:0.8rem; color:var(--gold);">JE T'AIME</p>
+            <h3 style="color:var(--gold); margin-bottom:15px;">MA REINE</h3>
+            <p>Tu es mon éternité, mon plus beau voyage stellaire.<br><br>Je t'aime infiniment.</p>
+            <p style="margin-top:20px; font-size:0.7rem; color:var(--gold);">TOUCHE POUR FERMER</p>
         </div>
     </div>
 
-    <div class="interaction-zone" id="touch-zone" onclick="triggerAction()">
+    <div class="interaction-zone" onclick="triggerAction()">
         <h2 class="main-heart-btn" id="btn-label">JE T'AIME</h2>
     </div>
 
     <canvas id="world"></canvas>
 
-    <div id="secret-btn" ontouchstart="startHold(event)" ontouchend="endHold()" onmousedown="startHold(event)" onmouseup="endHold()">
+    <div id="secret-btn" ontouchstart="startHold(event)" ontouchend="endHold()">
         <div id="hold-fill"></div>
         <span>🔒</span>
     </div>
@@ -145,7 +146,6 @@
         
         let width, height, dpr;
         let particles = [];
-        let touchParticles = [];
         let isRevealed = false;
         let rotation = 0;
         let holdTimer;
@@ -153,13 +153,8 @@
         let state = "NORMAL";
 
         const SOUVENIRS = [
-            "TON REGARD...",
-            "NOS FOUS RIRES...",
-            "TA DOUCEUR...",
-            "NOS NUITS ÉTOILÉES...",
-            "TON SOURIRE MAGIQUE...",
-            "MON AMOUR POUR TOI...",
-            "ATTENTION..."
+            "TON SOURIRE...", "NOS NUITS...", "TON REGARD...",
+            "CETTE MAGIE...", "NOTRE AMOUR...", "MON ÉTERNITÉ...", "REGARDE BIEN..."
         ];
 
         function init() {
@@ -168,18 +163,20 @@
             canvas.width = width * dpr; canvas.height = height * dpr;
             ctx.scale(dpr, dpr);
 
+            // TAILLE DU COEUR OPTIMISÉE POUR TÉLÉPHONE
+            // 0.032 assure que même sur les petits écrans, on voit tout le coeur
+            const heartScale = Math.min(width, height) * 0.032; 
+            
             particles = [];
-            // Recul de la taille (0.04 au lieu de 0.05) pour centrer
-            const heartSize = Math.min(width, height) * 0.04; 
-            for(let i=0; i<4000; i++) {
+            for(let i=0; i<3500; i++) {
                 let t = Math.random() * Math.PI * 2;
-                let r = Math.sqrt(Math.random()) * heartSize;
+                let r = Math.sqrt(Math.random()) * heartScale;
                 particles.push({
                     baseX: 16 * Math.pow(Math.sin(t), 3) * r,
                     baseY: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * r,
-                    baseZ: (Math.random()-0.5) * 180,
+                    baseZ: (Math.random()-0.5) * 150,
                     x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0,
-                    size: Math.random() * 1.4 + 0.4,
+                    size: Math.random() * 1.2 + 0.3,
                     color: Math.random() > 0.15 ? "#ff0033" : "#d4af37"
                 });
             }
@@ -193,21 +190,19 @@
                 document.getElementById('gate').style.display = 'none';
                 document.getElementById('ui-top').style.opacity = '1';
                 isRevealed = true;
-            }, 1000);
+            }, 800);
         }
 
         function triggerAction() {
             if(!isRevealed || state !== "NORMAL") return;
-            
             const txt = document.getElementById('m-text');
             txt.style.opacity = 0;
-            
             setTimeout(() => {
                 txt.innerText = SOUVENIRS[clickCount % SOUVENIRS.length];
                 txt.style.opacity = 1;
                 clickCount++;
                 if(clickCount === 8) startSupernova();
-            }, 300);
+            }, 250);
         }
 
         function startSupernova() {
@@ -216,17 +211,15 @@
             document.getElementById('ui-top').style.opacity = '0';
             
             setTimeout(() => {
-                const flash = document.getElementById('flash');
-                flash.style.opacity = '1';
+                document.getElementById('flash').style.opacity = '1';
                 setTimeout(() => {
-                    flash.style.opacity = '0';
+                    document.getElementById('flash').style.opacity = '0';
                     particles.forEach(p => {
-                        let f = Math.random() * 50 + 20;
+                        let f = Math.random() * 40 + 20;
                         p.vx = (Math.random() - 0.5) * f;
                         p.vy = (Math.random() - 0.5) * f;
                         p.vz = (Math.random() - 0.5) * f;
                     });
-                    
                     setTimeout(() => {
                         state = "MESSAGE";
                         document.getElementById('transition-msg').style.opacity = '1';
@@ -238,28 +231,16 @@
                                 clickCount = 0;
                                 document.getElementById('btn-label').style.opacity = '1';
                                 document.getElementById('ui-top').style.opacity = '1';
-                                document.getElementById('m-text').innerText = "CLÉMENCE, MON ÉTERNITÉ...";
+                                document.getElementById('m-text').innerText = "CLÉMENCE, MON TOUT...";
                             }, 3000);
                         }, 4000);
-                    }, 2500);
+                    }, 2000);
                 }, 100);
             }, 1000);
         }
 
-        // Effet de traînée tactile
-        window.addEventListener('touchmove', (e) => {
-            if(!isRevealed) return;
-            const t = e.touches[0];
-            for(let i=0; i<3; i++) {
-                touchParticles.push({
-                    x: t.clientX, y: t.clientY,
-                    vx: (Math.random()-0.5)*2, vy: (Math.random()-0.5)*2,
-                    life: 1, color: "#d4af37"
-                });
-            }
-        });
-
         function startHold(e) {
+            e.preventDefault();
             const fill = document.getElementById('hold-fill');
             fill.style.opacity = "1";
             fill.animate([{transform: 'rotate(0deg)'}, {transform: 'rotate(360deg)'}], {duration: 1000, iterations: Infinity});
@@ -271,34 +252,13 @@
         function endHold() { clearTimeout(holdTimer); document.getElementById('hold-fill').style.opacity = "0"; }
 
         function animate() {
-            // Effet d'aura en arrière-plan
             ctx.fillStyle = 'rgba(0,0,0,0.2)';
             ctx.fillRect(0,0,width,height);
 
             if(isRevealed) {
-                rotation += 0.012;
+                rotation += 0.013;
                 let pulse = 1 + Math.sin(Date.now() * 0.003) * 0.1;
 
-                // Dessiner l'aura
-                if(state === "NORMAL") {
-                    let grad = ctx.createRadialGradient(width/2, height/2.2, 0, width/2, height/2.2, 150 * pulse);
-                    grad.addColorStop(0, 'rgba(255, 0, 51, 0.15)');
-                    grad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = grad;
-                    ctx.fillRect(0,0,width,height);
-                }
-
-                // Particules tactiles
-                touchParticles.forEach((tp, i) => {
-                    tp.x += tp.vx; tp.y += tp.vy;
-                    tp.life -= 0.02;
-                    ctx.globalAlpha = tp.life;
-                    ctx.fillStyle = tp.color;
-                    ctx.fillRect(tp.x, tp.y, 2, 2);
-                    if(tp.life <= 0) touchParticles.splice(i, 1);
-                });
-
-                // Particules du cœur
                 particles.forEach((p, i) => {
                     if(state === "EXPLODING") {
                         p.x += p.vx; p.y += p.vy; p.z += p.vz;
@@ -307,39 +267,19 @@
                         p.x += (p.baseX - p.x) * 0.08;
                         p.y += (p.baseY - p.y) * 0.08;
                         p.z += (p.baseZ - p.z) * 0.08;
-                    } else if(state === "NORMAL") {
-                        p.x = p.baseX; p.y = p.baseY; p.z = p.baseZ;
                     }
 
                     let cosR = Math.cos(rotation), sinR = Math.sin(rotation);
                     let rx = p.x * cosR - p.z * sinR;
                     let rz = p.x * sinR + p.z * cosR;
-                    let s = 500 / (500 + rz + 200);
+                    let s = 450 / (450 + rz + 180);
                     let px = rx * s * (state === "NORMAL" ? pulse : 1) + width / 2;
-                    let py = p.y * s * (state === "NORMAL" ? pulse : 1) + height / 2.2;
+                    let py = p.y * s * (state === "NORMAL" ? pulse : 1) + height * 0.48; // Centré parfaitement
 
                     ctx.globalAlpha = s;
                     ctx.fillStyle = p.color;
                     ctx.fillRect(px, py, p.size * s, p.size * s);
                 });
-
-                // Constellations ultra-fines
-                if(state === "NORMAL" || state === "REFORMING") {
-                    ctx.beginPath();
-                    ctx.strokeStyle = 'rgba(212, 175, 55, 0.06)';
-                    for(let i=0; i<particles.length; i+=180) {
-                        for(let j=i+180; j<particles.length; j+=180) {
-                             let d = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
-                             if(d < 40) {
-                                 let p1 = particles[i], p2 = particles[j];
-                                 let s1 = 500/(500+p1.z+200), s2 = 500/(500+p2.z+200);
-                                 ctx.moveTo(p1.x*s1*pulse + width/2, p1.y*s1*pulse + height/2.2);
-                                 ctx.lineTo(p2.x*s2*pulse + width/2, p2.y*s2*pulse + height/2.2);
-                             }
-                        }
-                    }
-                    ctx.stroke();
-                }
             }
             requestAnimationFrame(animate);
         }
