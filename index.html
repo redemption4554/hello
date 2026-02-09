@@ -32,9 +32,9 @@
 
         canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 
-        /* Message du haut - Descendu pour éviter l'encoche iPhone */
+        /* Message du haut - Descendu sous la Dynamic Island */
         #ui-top {
-            position: absolute; top: 18%; left: 0; width: 100%;
+            position: absolute; top: 15%; left: 0; width: 100%;
             text-align: center; z-index: 5; pointer-events: none;
             opacity: 0; transition: 1s;
         }
@@ -42,26 +42,25 @@
             font-family: 'Cinzel', serif; color: var(--gold);
             font-size: 0.8rem; letter-spacing: 2px;
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-            padding: 0 20px;
         }
 
-        /* Message d'explosion central */
+        /* Message d'explosion */
         #transition-msg {
-            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 85%; text-align: center; z-index: 50; color: white;
             font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 2px;
             opacity: 0; transition: 1.5s; line-height: 1.6;
             text-shadow: 0 0 20px var(--gold); pointer-events: none;
         }
 
-        /* ZONE DE CLIC DU COEUR - Agrandie et centrée */
+        /* ZONE DE CLIC ET TEXTE - Centrage parfait */
         .interaction-zone {
             position: absolute; 
-            top: 45%; left: 50%; 
+            top: 50%; left: 50%; 
             transform: translate(-50%, -50%);
-            width: 300px; height: 350px; /* Grande zone de clic */
+            width: 100%; height: 40%;
             display: flex; justify-content: center; align-items: center;
-            z-index: 100; /* Priorité au clic */
+            z-index: 100;
             cursor: pointer;
             pointer-events: all;
         }
@@ -69,18 +68,19 @@
         .main-heart-btn {
             font-family: 'Cinzel', serif; color: #fff; font-size: 1.8rem;
             letter-spacing: 5px; text-shadow: 0 0 25px var(--red);
-            pointer-events: none; /* Le texte ne bloque pas le clic du parent */
+            pointer-events: none;
             transition: transform 0.2s;
+            margin-top: -10px; /* Ajustement visuel pour le centre du coeur */
         }
 
-        /* CADENAS - Remonté pour éviter la barre de lien Safari/Chrome */
+        /* CADENAS - Remonté pour éviter le lien Safari */
         #secret-btn {
             position: absolute; 
-            bottom: 160px; /* Remonté significativement */
+            bottom: 120px; 
             left: 50%; transform: translateX(-50%);
             width: 60px; height: 60px; border-radius: 50%;
             border: 1px solid var(--gold);
-            background: rgba(0,0,0,0.7); z-index: 150;
+            background: rgba(0,0,0,0.8); z-index: 150;
             display: flex; justify-content: center; align-items: center;
             color: var(--gold); font-size: 1.4rem;
             pointer-events: all;
@@ -91,7 +91,6 @@
             opacity: 0;
         }
 
-        /* Lettre */
         #hiddenLetter {
             position: fixed; inset: 0; background: rgba(0,0,0,0.98);
             z-index: 3000; display: none; justify-content: center; align-items: center;
@@ -135,14 +134,12 @@
         </div>
     </div>
 
-    <!-- Zone de clic du JE T'AIME et du Coeur -->
-    <div class="interaction-zone" id="click-zone" ontouchstart="triggerAction()" onclick="triggerAction()">
+    <div class="interaction-zone" ontouchstart="triggerAction()" onclick="triggerAction()">
         <h2 class="main-heart-btn" id="btn-label">JE T'AIME</h2>
     </div>
 
     <canvas id="world"></canvas>
 
-    <!-- Cadenas remonté -->
     <div id="secret-btn" ontouchstart="startHold(event)" ontouchend="endHold()" onmousedown="startHold(event)" onmouseup="endHold()">
         <div id="hold-fill"></div>
         <span>🔒</span>
@@ -172,8 +169,8 @@
             canvas.width = width * dpr; canvas.height = height * dpr;
             ctx.scale(dpr, dpr);
 
-            // Cœur plus petit (0.028) pour être sûr qu'il rentre en portrait sans être coupé
-            const heartScale = Math.min(width, height) * 0.028; 
+            // Taille du cœur réduite pour mobile portrait
+            const heartScale = Math.min(width, height) * 0.03; 
             
             particles = [];
             for(let i=0; i<3000; i++) {
@@ -203,12 +200,6 @@
 
         function triggerAction() {
             if(!isRevealed || state !== "NORMAL") return;
-            
-            // Petit effet visuel sur le texte lors du clic
-            const btn = document.getElementById('btn-label');
-            btn.style.transform = "scale(0.8)";
-            setTimeout(() => btn.style.transform = "scale(1)", 100);
-
             const txt = document.getElementById('m-text');
             txt.style.opacity = 0;
             setTimeout(() => {
@@ -223,7 +214,6 @@
             state = "EXPLODING";
             document.getElementById('btn-label').style.opacity = '0';
             document.getElementById('ui-top').style.opacity = '0';
-            document.getElementById('click-zone').style.pointerEvents = 'none';
             
             setTimeout(() => {
                 document.getElementById('flash').style.opacity = '1';
@@ -246,7 +236,6 @@
                                 clickCount = 0;
                                 document.getElementById('btn-label').style.opacity = '1';
                                 document.getElementById('ui-top').style.opacity = '1';
-                                document.getElementById('click-zone').style.pointerEvents = 'all';
                                 document.getElementById('m-text').innerText = "CLÉMENCE, JE T'AIME...";
                             }, 3000);
                         }, 4000);
@@ -288,8 +277,10 @@
                     let rx = p.x * cosR - p.z * sinR;
                     let rz = p.x * sinR + p.z * cosR;
                     let s = 450 / (450 + rz + 180);
+                    
+                    // CORRECTION ICI : height * 0.5 pour centrer parfaitement le coeur
                     let px = rx * s * (state === "NORMAL" ? pulse : 1) + width / 2;
-                    let py = p.y * s * (state === "NORMAL" ? pulse : 1) + height * 0.45; // Centré haut pour éviter les barres
+                    let py = p.y * s * (state === "NORMAL" ? pulse : 1) + height * 0.5;
 
                     ctx.globalAlpha = s;
                     ctx.fillStyle = p.color;
